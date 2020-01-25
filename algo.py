@@ -4,10 +4,11 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import RegexpTokenizer
 
-from nltk.probability import FreqDist
-from nltk.stem import WordNetLemmatizer
-
-from itertools import product
+import spacy
+from spacy import displacy
+from collections import Counter
+import en_core_web_sm
+nlp = en_core_web_sm.load()
 
 
 stopWords = set(stopwords.words('english'))
@@ -15,7 +16,7 @@ tokenizer = RegexpTokenizer(r'\w+')
 
 
 
-yeet = "TODAY I WOKE UP AND HAD SOME COFFEE. Next I walked to school"
+yeet = "TODAY I WOKE UP AND HAD SOME COFFEE. Next I walked to school. I SAW TOM!!!! YAY"
 
 def preproc(text):
         final = []
@@ -26,13 +27,21 @@ def preproc(text):
                 final.append(n);
         return final
     
+    
+def findpnouns(text):
+    doc = nlp(text);
+    for x in doc.ents:
+        print(x.text);
+    
 def start(text):
     
     phara = sent_tokenize(text)
-    
     for rawsent in phara:
-        sent = preproc(rawsent)
-        print(sent)
+        
+        propnoun = findpnouns(rawsent)
+        #sent = preproc(rawsent)
+        #doc = nlp("Google is");
+        #print([(X.text, X.label_) for X in doc.ents])
 
 
 
