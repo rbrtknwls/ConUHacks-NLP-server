@@ -12,7 +12,7 @@ tokenizer = RegexpTokenizer(r'\w+')
 
 
 
-yeet = "I walked to google. I talked to TOM. I got work"
+yeet = "I worked at google. I talked to TOM. I got work"
 
 
 # FUNCTIONS THAT RUN BEFORE TO CLEAN CODE
@@ -40,6 +40,11 @@ def classifyverbs(text):
             final.append(tup[0])
     return final
 
+
+def simindexv (text):
+
+def simindexn (text):
+
 def start(text):
     
     phara = sent_tokenize(text)
@@ -47,12 +52,11 @@ def start(text):
         sent = pos_tag(preproc(rawsent))
         
         
-        print ("finding nouns!")
-        print(classifynouns(sent));
+        
         print ("finding verbs!")
         print(classifyverbs(sent));
-        #doc = nlp("Google is");
-        #print([(X.text, X.label_) for X in doc.ents])
+        print ("finding nouns!")
+        print(classifynouns(sent));
 
 
 
