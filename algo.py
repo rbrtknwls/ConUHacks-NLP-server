@@ -12,7 +12,8 @@ nlp = spacy.load('en_core_web_sm')
 stopWords = set(stopwords.words('english') + ["hate","dislike","like","love","hated","disliked","liked",'loved','today'])
 tokenizer = RegexpTokenizer(r'\w+')
 
-yeet = "I ran today. I participated in a hackathon. I sleep at the hackathon. "
+yeet = "I like playing tennis. I learned about math."
+#yeet = "I ran today. I participated in a hackathon. I sleep at the hackathon. "
 
 # FUNCTIONS THAT RUN BEFORE TO CLEAN CODE
 def preproc(text):
@@ -44,17 +45,23 @@ def classifyverbs(text):
 def simindexv (text):
     indexa = 0
     indexr = 0
+    indexw = 0
     ttext = nlp(text)
     active = ['swim', 'drown', 'swimming', 'float', #index for swim
               'jog','jogged', 'ramble', 'nudge', 'trot', 'lope', #index for jog
              'walk','walking','walked','pass','run', #index for jog
              'ski', #index for ski
              'run','ran', 'go'] #index for ski
+    
     rec = ['consume', 'eat', 'munch', #index for eat
              'observe','watch','watch', 'see', 'view','viewed', #index for see
              'blab','lecture','speak','talk','talked','sing' #index for talk
              'play','played', #index for play
              'dance', 'sleep'] #index for dance 
+    
+    wor = ['code', 'learn', 'study', #index for eat
+             'memorize','instruct','work', 'cram', 'do','did', #index for see
+             'remember','consider'] 
     
     for word in active:
         z = nlp(word)
@@ -64,12 +71,19 @@ def simindexv (text):
         z = nlp(word)
         indexr = max(indexr, z.similarity(ttext))
         
+    for word in wor:
+        z = nlp(word)
+        indexw = max(indexr, z.similarity(ttext))
+        
     
     
-    if (indexa > indexr):
+    if (indexa > indexr and indexa > indexw):
         return ("active")
-    else:
+    elif (indexr > indexa and indexr > indexw):
         return ('recreational')
+    else:
+        return('work')
+    
     
     
     return("ass")
@@ -86,7 +100,7 @@ def gensudonyms(text):
 
     
 def start(text):
-    
+    li = [["active"],["recreational"],["work"]]
     phara = sent_tokenize(text)
     for rawsent in phara:
         print(rawsent)
@@ -98,7 +112,7 @@ def start(text):
         verb = classifyverbs(sent);
         noun = nnouns(sent);
         
-
+        
         
         if (len(verb) == 0):
             print("SENT DOESNT MAKE SENSE")
@@ -108,7 +122,8 @@ def start(text):
             print(verb)
             
             vresult = simindexv(verb)
-
+            
+            
             print("PARENT:" +vresult)
             print("CHILD:   " + verb )
             if (len(noun) != 0):
@@ -117,11 +132,11 @@ def start(text):
             
             
         
+       
+        
+        
+        
         '''
-        
-        
-        
-
         print ("finding verbs!")
         print(classifyverbs(sent));
         print ("finding nouns!")
@@ -130,5 +145,16 @@ def start(text):
 
 
 
-start(yeet)
+        
+def saving(group, text):
+    val = {}
+    
+    if group in val and text in val[group]:
+        print("PASS")
+    else:
+        val[group,text] = text
+    
+    print(val);
+#start(yeet)
+saving("active","ass")
 
