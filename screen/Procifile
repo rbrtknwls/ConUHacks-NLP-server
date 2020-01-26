@@ -1,1 +1,1 @@
-web: gunicorn screen.wsgi 
+web: bin/start-pgbouncer-stunnel gunicorn screen.wsgi 
