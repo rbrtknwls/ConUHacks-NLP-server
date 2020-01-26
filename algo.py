@@ -44,7 +44,6 @@ def start(text):
     
     phara = sent_tokenize(text)
     for rawsent in phara:
-        print("-------")
         sent = pos_tag(preproc(rawsent))
         
         
