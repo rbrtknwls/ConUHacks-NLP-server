@@ -1,0 +1,1 @@
+{"active": [{"playing": 1, "tennis": 1}, {"playing": 1, "video": 1}], "recreational": [], "work": [{"learned": 1, "math": 1}], "nodes": [{"1": 81.10000000000001}, {"2": 0.0}, {"3": 81.10000000000001}], "final": [{"average": 54.06666666666667}]}

@@ -3,18 +3,27 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import RegexpTokenizer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer 
 from nltk import pos_tag
 
+import json
 import spacy 
   
 nlp = spacy.load('en_core_web_sm') 
 
+# ----- REFs -----
+sid = SentimentIntensityAnalyzer()
+# Call the prebuilt Sentiment ML algo
 stopWords = set(stopwords.words('english') + ["hate","dislike","like","love","hated","disliked","liked",'loved','today'])
 tokenizer = RegexpTokenizer(r'\w+')
+yeet = "I like playing tennis. I learned about math. I like playing video"
 
-yeet = "I like playing tennis. I learned about math."
-#yeet = "I ran today. I participated in a hackathon. I sleep at the hackathon. "
-
+data = {}
+data['active'] = []
+data['recreational'] = []
+data['work'] = []
+data['nodes'] = []
+data['final'] = []
 # FUNCTIONS THAT RUN BEFORE TO CLEAN CODE
 def preproc(text):
         final = []
@@ -88,22 +97,39 @@ def simindexv (text):
     
     return("ass")
 
-def gensudonyms(text):
-    synonyms = [] 
-  
-    for syn in wordnet.synsets(text): 
-        for l in syn.lemmas(): 
-            synonyms.append(l.name()) 
+
+def child2 (group, verb):
+    data[group].append({
+        "verb": verb
+    })
+
+def child3 (group, verb, noun):
+    data[group].append({
+        verb: 1,
+        noun: 1
+    })
+# QUERY CODE
+def intentfram (sent):
+    #Code to find intensisty
+    score = sid.polarity_scores(sent);
+    #Score is a dict with entries for [pos] = positivity and [neg] = negitivity
+    mat = 100* score['pos'] -100 * score['neg']
+    return mat 
     
-    return set(synonyms)
-  
+
 
     
 def start(text):
-    li = [["active"],["recreational"],["work"]]
+    count = 0;
+    total = 0;
     phara = sent_tokenize(text)
     for rawsent in phara:
-        print(rawsent)
+        count += 1;
+        
+        data["nodes"].append({
+            count: intentfram(rawsent) 
+        });
+        total += intentfram(rawsent);
         sent = nlp(' '.join(preproc(rawsent)))
         
         for word in sent:
@@ -123,17 +149,14 @@ def start(text):
             
             vresult = simindexv(verb)
             
-            
-            print("PARENT:" +vresult)
-            print("CHILD:   " + verb )
-            if (len(noun) != 0):
-                noun = noun[0]
-                print("CHILD:         " + noun )
+            if (len(noun[0]) == 0):
+                child2(vresult, verb);
+            else:
+                child3(vresult, verb,noun[0])
             
             
-        
+            
        
-        
         
         
         '''
@@ -143,18 +166,16 @@ def start(text):
         print(nnouns(sent));
         '''
 
+    data["final"].append({
+        "average": total/count
+    });
+    print(data);
+        
+    with open('data.txt', 'w') as outfile:
+        json.dump(data, outfile)
 
 
         
-def saving(group, text):
-    val = {}
-    
-    if group in val and text in val[group]:
-        print("PASS")
-    else:
-        val[group,text] = text
-    
-    print(val);
-#start(yeet)
-saving("active","ass")
+start(yeet)
+#saving("active","ass")
 
