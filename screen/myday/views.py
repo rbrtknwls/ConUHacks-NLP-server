@@ -1,21 +1,30 @@
+from django.shortcuts import render
+import nltk
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import RegexpTokenizer
-from nltk.sentiment.vader import SentimentIntensityAnalyzer 
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk import pos_tag
+import datetime
+
 
 import spacy
-  
-nlp = spacy.load('en_core_web_sm') 
+
+from .models import MyJournal
+#from django.http import HTTPRe
+
+
+    
+nlp = spacy.load('en_core_web_sm')
 
 # ----- REFs -----
 sid = SentimentIntensityAnalyzer()
 # Call the prebuilt Sentiment ML algo
 stopWords = set(stopwords.words('english') + ["hate","dislike","like","love","hated","disliked","liked",'loved','today'])
 tokenizer = RegexpTokenizer(r'\w+')
-yeet = "I playing tennis. I learned about math. I like playing video"
+yeet = "I run tennis. I learned about math. I like playing video"
 
 data = {}
 data['active'] = []
@@ -37,14 +46,14 @@ def preproc(text):
 def nnouns(text):
     final = []
     for tup in text:
-        if (tup.pos_ == "NOUN" or tup.pos_ == "PROPN"): 
+        if (tup.pos_ == "NOUN" or tup.pos_ == "PROPN"):
             final.append(tup.text)
     return final
 
 def classifyverbs(text):
     final = []
     for tup in text:
-        if (tup.pos_ == "VERB"): 
+        if (tup.pos_ == "VERB"):
             final.append(tup.text)
     return final
 
@@ -65,11 +74,11 @@ def simindexv (text):
              'observe','watch','watch', 'see', 'view','viewed', #index for see
              'blab','lecture','speak','talk','talked','sing' #index for talk
              'play','played', #index for play
-             'dance', 'sleep'] #index for dance 
+             'dance', 'sleep'] #index for dance
     
     wor = ['code', 'learn', 'study', #index for eat
              'memorize','instruct','work', 'cram', 'do','did', #index for see
-             'remember','consider'] 
+             'remember','consider']
     
     for word in active:
         z = nlp(word)
@@ -113,7 +122,7 @@ def intentfram (sent):
     score = sid.polarity_scores(sent);
     #Score is a dict with entries for [pos] = positivity and [neg] = negitivity
     mat = 100* score['pos'] -100 * score['neg']
-    return mat 
+    return mat
     
 
 
@@ -126,7 +135,7 @@ def start(text):
         count += 1;
         
         data["nodes"].append({
-            count: intentfram(rawsent) 
+            count: intentfram(rawsent)
         });
         total += intentfram(rawsent);
         sent = nlp(' '.join(preproc(rawsent)))
@@ -174,4 +183,30 @@ def start(text):
         
 start(yeet)
 #saving("active","ass")
+
+    
+    
+# Create your views here.
+def allday(request):
+    #request.POST.get("title","ok")
+    #all_days = MyJournal.objects.all()
+    #return render(request, 'day.html', {'allthedays': all_days})
+    a = MyJournal(content = data, date_created = datetime.date.today())
+    context= {
+    'info': a.content,
+    'date': a.date_created,
+    }
+    return render(request, 'days.html', context)
+    
+def oneday(request):
+    
+    #all_days = MyJournal.objects.all()
+    
+    a = MyJournal(content = data, date_created = datetime.date.today())
+    context= {
+    'info': a.content,
+    'date':a.date_created,
+    }
+    return render(request, 'day.html', context)
+    #return render(request, 'days.html',{'allthedays': all_days[day_id-1]})
 
